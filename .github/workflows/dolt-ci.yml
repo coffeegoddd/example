@@ -8,9 +8,6 @@ permissions:
   contents: read
 
 env:
-  # The git ref used to store Dolt's data inside this Git remote.
-  # Override if you configured a custom ref (e.g. refs/dolt/custom).
-  DOLT_GIT_REF: refs/dolt/data
   # Pin a Dolt version for reproducible CI runs.
   DOLT_VERSION: v1.81.8
 
@@ -35,7 +32,7 @@ jobs:
         run: |
           set -euo pipefail
           remote="https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
-          dolt clone --ref "${DOLT_GIT_REF}" "${remote}" db
+          dolt clone "${remote}" db
         env:
           GITHUB_TOKEN: ${{ github.token }}
 
