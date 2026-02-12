@@ -38,6 +38,8 @@ jobs:
           set -euo pipefail
           remote="https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
           dolt clone --ref "${DOLT_GIT_REF}" "${remote}" db
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
 
       - name: Basic database sanity checks
         shell: bash
@@ -47,5 +49,3 @@ jobs:
           dolt status
           dolt sql -q "show tables;" -r csv
           dolt sql -q "select count(*) as commits from dolt_log;" -r csv
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
