@@ -1,0 +1,51 @@
+name: dolt-db-ci
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+env:
+  # The git ref used to store Dolt's data inside this Git remote.
+  # Override if you configured a custom ref (e.g. refs/dolt/custom).
+  DOLT_GIT_REF: refs/dolt/data
+  # Pin a Dolt version for reproducible CI runs.
+  DOLT_VERSION: v1.81.8
+
+jobs:
+  dolt:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Git repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install dolt
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -fsSL "https://github.com/dolthub/dolt/releases/download/${DOLT_VERSION}/dolt-linux-amd64.tar.gz" -o dolt.tgz
+          tar -xzf dolt.tgz
+          sudo install -m 0755 dolt-linux-amd64/bin/dolt /usr/local/bin/dolt
+          dolt version
+
+      - name: Clone Dolt database from this GitHub remote
+        shell: bash
+        run: |
+          set -euo pipefail
+          remote="https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          dolt clone --ref "${DOLT_GIT_REF}" "${remote}" db
+
+      - name: Basic database sanity checks
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd db
+          dolt status
+          dolt sql -q "show tables;" -r csv
+          dolt sql -q "select count(*) as commits from dolt_log;" -r csv
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
