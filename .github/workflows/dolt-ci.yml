@@ -27,9 +27,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          curl -fsSL "https://github.com/dolthub/dolt/releases/download/${DOLT_VERSION}/dolt-linux-amd64.tar.gz" -o dolt.tgz
-          tar -xzf dolt.tgz
-          sudo install -m 0755 dolt-linux-amd64/bin/dolt /usr/local/bin/dolt
+          curl -fsSL "https://github.com/dolthub/dolt/releases/download/${DOLT_VERSION}/install.sh" | sudo bash
           dolt version
 
       - name: Clone Dolt database from this GitHub remote
