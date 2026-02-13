@@ -9,7 +9,7 @@ permissions:
 
 env:
   # Pin a Dolt version for reproducible CI runs.
-  DOLT_VERSION: v1.81.8
+  DOLT_VERSION: v1.81.10
 
 jobs:
   dolt:
